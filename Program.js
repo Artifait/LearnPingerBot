@@ -39,7 +39,7 @@ defaultScenario.registerBlock(new CreateRecurringEventBlock());
 const token = "YOUR_TOKEN";
 if(token === "YOUR_TOKEN")
 {
-    console.log("Пожалуйста, укажите токен вашего бота.");
+    console.log("Пожалуйста, укажите токен вашего бота.(39 строка в Program.js)");
     process.exit(0);
 }
 
@@ -52,7 +52,7 @@ const userStateContext = new UserStateContext();
 userStateContext.initialize().then(() => {
     const botEngine = new BotEngine(scenarioSelector, userStateContext);
 
-    botEngine.startBot().then(() => {
+    botEngine.startBot(token).then(() => {
         // После старта бота запускаем планировщик уведомлений.
         const getNotificationOffset = (userId) => {
             // Используем настройки для каждого пользователя
