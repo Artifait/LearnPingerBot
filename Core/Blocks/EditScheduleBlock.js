@@ -1,7 +1,6 @@
 // Core/Blocks/EditScheduleBlock.js
 const { HandlerBlock } = require('./HandlerBlock');
 const { HandlerBlockResult } = require('./HandlerBlockResult');
-const { addEvent, editEvent, deleteEvent } = require('../../scheduleManager');
 const { getCurrentGroup } = require('../../groupManager');
 
 class EditScheduleBlock extends HandlerBlock {
@@ -33,19 +32,24 @@ class EditScheduleBlock extends HandlerBlock {
 
         const message =
             "Редактирование расписания.\n" +
-            "Введите команду:\n" +
-            "  /add - добавить событие\n" +
-            "  /edit - редактировать событие\n" +
-            "  /delete - удалить событие\n" +
-            "  /exit - выйти в главное меню\n\n" +
-            "Формат для /add:\n" +
-            "/add YYYY-MM-DD HH:MM Место Предмет Преподаватель Тип[once|recurring] [Интервал(мин)] [Expiry(мин)]\n" +
-            "Пример:\n" +
-            "/add 2025-03-15 10:00 Аудитория-101 Математика Иванов once\n" +
-            "или\n" +
-            "/add 2025-03-15 10:00 Аудитория-101 Физика Петров recurring 1440 120";
+            "Что вы хотите сделать?";
 
-        await context.send(bot, message);
+        const options = {
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        { text: "Добавить event", callback_data: "create_event" },
+                        { text: "Редактировать event", callback_data: "edit_event" },
+                    ],
+                    [
+                        { text: "Удалить event", callback_data: "delete_event" },
+                        { text: "В главное меню", callback_data: "main_menu" },
+                    ]
+                ]
+            }
+        };
+
+        await context.send(bot, message, options);
     }
 
     async handleAsync(message, context, bot) {
@@ -55,45 +59,15 @@ class EditScheduleBlock extends HandlerBlock {
         }
 
         if (text.startsWith('/add')) {
-            // Переход к выбору типа события (одноразовое или повторяющееся)
             return HandlerBlockResult.end("CreateEventBlock");
         }
 
-
         if (text.startsWith('/edit')) {
-            const parts = text.split(' ');
-            if (parts.length < 8) {
-                await bot.sendMessage(context.chatId, "Неверный формат. Используйте: /edit eventId YYYY-MM-DD HH:MM Место Предмет Преподаватель Тип [Интервал] [Expiry]");
-                return HandlerBlockResult.cont();
-            }
-            const [ , id, date, time, place, subject, teacher, type, interval, expiry ] = parts;
-            const updated = { date, time, place, subject, teacher, type: type.toLowerCase() };
-            if (type.toLowerCase() === 'recurring' && interval) {
-                updated.interval = Number(interval);
-            }
-            if (expiry) {
-                updated.expiryMinutes = Number(expiry);
-            }
-
-            const result = editEvent(Number(id), updated);
-            if (result) {
-                await bot.sendMessage(context.chatId, "Событие обновлено.");
-            } else {
-                await bot.sendMessage(context.chatId, "Событие не найдено.");
-            }
-            return HandlerBlockResult.cont();
+            return HandlerBlockResult.end("EditEventBlock");
         }
 
         if (text.startsWith('/delete')) {
-            const parts = text.split(' ');
-            if (parts.length !== 2) {
-                await bot.sendMessage(context.chatId, "Неверный формат. Используйте: /delete eventId");
-                return HandlerBlockResult.cont();
-            }
-            const id = Number(parts[1]);
-            deleteEvent(id);
-            await bot.sendMessage(context.chatId, "Событие удалено (если существовало).");
-            return HandlerBlockResult.cont();
+            return HandlerBlockResult.end("DeleteEventBlock");
         }
 
         await bot.sendMessage(context.chatId, "Команда не распознана. Используйте /add, /edit, /delete или /exit.");
@@ -101,10 +75,27 @@ class EditScheduleBlock extends HandlerBlock {
     }
 
     async handleCallbackAsync(callbackQuery, context, bot) {
-        if (callbackQuery.data === "main_menu") {
-            return HandlerBlockResult.end("MainMenuBlock");
+        let nextBlockId = null;
+
+        switch (callbackQuery.data) {
+            case 'main_menu':
+                nextBlockId = 'MainMenuBlock';
+                break;
+            case 'create_event':
+                nextBlockId = 'CreateEventBlock';
+                break;
+            case 'edit_event':
+                nextBlockId = 'EditEventBlock';
+                break;
+            case 'delete_event':
+                nextBlockId = 'DeleteEventBlock';
+                break;
+            default:
+                await this.enterAsync(context, bot);
+                return HandlerBlockResult.cont();
         }
-        return HandlerBlockResult.cont();
+
+        return HandlerBlockResult.end(nextBlockId, {});
     }
 
     onEnd() { }

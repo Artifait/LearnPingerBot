@@ -2,7 +2,7 @@
 const { HandlerBlock } = require('./HandlerBlock');
 const { HandlerBlockResult } = require('./HandlerBlockResult');
 const { getGroupsByUser, getCreatedGroups, getCurrentGroup } = require('../../groupManager');
-const { getEventsForGroup } = require('../../scheduleManager');
+const { getEventsByGroup } = require('../../scheduleManager');
 
 class GroupsInfoBlock extends HandlerBlock {
     constructor() {
@@ -26,7 +26,7 @@ class GroupsInfoBlock extends HandlerBlock {
             message += "  Нет групп\n";
         } else {
             groups.forEach(group => {
-                const events = getEventsForGroup(group.key);
+                const events = getEventsByGroup(group.key);
                 message += `  Название: ${group.name}\n  Ключ: ${group.key}\n  Участников: ${group.members.length}\n  Событий: ${events.length}\n`;
                 if (currentGroup === group.key) {
                     message += "  [Текущая группа]\n";
@@ -40,7 +40,7 @@ class GroupsInfoBlock extends HandlerBlock {
             message += "  Нет созданных групп\n";
         } else {
             createdGroups.forEach(group => {
-                const events = getEventsForGroup(group.key);
+                const events = getEventsByGroup(group.key);
                 message += `  Название: ${group.name}\n  Ключ: ${group.key}\n  Участников: ${group.members.length}\n  Событий: ${events.length}\n`;
                 if (currentGroup === group.key) {
                     message += "  [Текущая группа]\n";

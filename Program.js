@@ -12,9 +12,11 @@ const { JoinGroupBlock } = require('./Core/Blocks/JoinGroupBlock');
 const { GroupsInfoBlock } = require('./Core/Blocks/GroupsInfoBlock');
 const { SwitchGroupBlock } = require('./Core/Blocks/SwitchGroupBlock');
 const { DeleteGroupBlock } = require("./Core/Blocks/DeleteGroupBlock");
-const {CreateEventBlock} = require("./Core/Blocks/CreateEventBlock");
-const {CreateOneTimeEventBlock} = require("./Core/Blocks/CreateOneTimeEventBlock");
-const {CreateRecurringEventBlock} = require("./Core/Blocks/CreateRecurringEventBlock");
+const { CreateEventBlock} = require("./Core/Blocks/CreateEventBlock");
+const { CreateOneTimeEventBlock } = require("./Core/Blocks/CreateOneTimeEventBlock");
+const { CreateRecurringEventBlock} = require("./Core/Blocks/CreateRecurringEventBlock");
+const { DeleteEventBlock } = require('./Core/Blocks/DeleteEventBlock');
+const { EditEventBlock } = require('./Core/Blocks/EditEventBlock');
 const { startNotificationScheduler } = require('./notificationScheduler');
 
 // Создаём сценарий с уникальным идентификатором
@@ -35,11 +37,13 @@ defaultScenario.registerBlock(new DeleteGroupBlock());
 defaultScenario.registerBlock(new CreateEventBlock());
 defaultScenario.registerBlock(new CreateOneTimeEventBlock());
 defaultScenario.registerBlock(new CreateRecurringEventBlock());
+defaultScenario.registerBlock(new DeleteEventBlock());
+defaultScenario.registerBlock(new EditEventBlock());
 
 const token = "YOUR_TOKEN";
 if(token === "YOUR_TOKEN")
 {
-    console.log("Пожалуйста, укажите токен вашего бота.(39 строка в Program.js)");
+    console.log("Пожалуйста, укажите токен вашего бота(39 строка в Program.js).");
     process.exit(0);
 }
 
