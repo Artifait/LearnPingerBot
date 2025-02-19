@@ -17,21 +17,23 @@ class GroupsInfoBlock extends HandlerBlock {
         const userId = context.chatId;
         let groups = getGroupsByUser(userId);
         const createdGroups = getCreatedGroups(userId);
+        const createdGroupKeys = createdGroups.map((group) => group.key);
         const currentGroup = getCurrentGroup(userId);
         let message = "Информация о ваших группах:\n\n";
 
         message += "Группы, в которых вы состоите:\n";
-        groups = groups.filter((group) => createdGroups.includes(group));
         if (groups.length === 0) {
             message += "  Нет групп\n";
         } else {
             groups.forEach(group => {
-                const events = getEventsByGroup(group.key);
-                message += `  Название: ${group.name}\n  Ключ: ${group.key}\n  Участников: ${group.members.length}\n  Событий: ${events.length}\n`;
-                if (currentGroup === group.key) {
-                    message += "  [Текущая группа]\n";
+                if(!createdGroupKeys.includes(group.key)) {
+                    const events = getEventsByGroup(group.key);
+                    message += `  Название: ${group.name}\n  Ключ: ${group.key}\n  Участников: ${group.members.length}\n  Событий: ${events.length}\n`;
+                    if (currentGroup === group.key) {
+                        message += "  [Текущая группа]\n";
+                    }
+                    message += "\n";
                 }
-                message += "\n";
             });
         }
 

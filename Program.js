@@ -43,7 +43,7 @@ defaultScenario.registerBlock(new EditEventBlock());
 const token = "YOUR_TOKEN";
 if(token === "YOUR_TOKEN")
 {
-    console.log("Пожалуйста, укажите токен вашего бота(39 строка в Program.js).");
+    console.log("Пожалуйста, укажите токен вашего бота(43 строка в Program.js).");
     process.exit(0);
 }
 
